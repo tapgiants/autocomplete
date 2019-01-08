@@ -1,6 +1,6 @@
 {
   "name": "@tapgiants/autocomplete",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Autocomplete field",
   "main": "build/index.js",
   "repository": "https://github.com/tapgiants/autocomplete.git",

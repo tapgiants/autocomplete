@@ -32,7 +32,7 @@ const mangeInternalStateOnChange = (qValue, name, value, setFormikState) => {
 };
 
 const mangeInternalStateOnSelect = (qValue, name, item, setFormikState, autoCleanup) => {
-  if (autoCleanup) {
+  if (autoCleanup && qValue) {
     delete qValue[name];
     setFormikState({ qValue });
   } else {
