@@ -11,10 +11,33 @@ const menuStyle = {
 };
 
 const getValue = (q, qValue, name) => {
-  if (!q) return '';
-  if (qValue && qValue[name]) return qValue[name].label;
+  if (!q && !qValue) return '';
+
+  if (qValue && qValue[name] && q != '' && qValue[name].label != q) {
+    return q;
+  }
+
+  if (qValue && qValue[name]) {
+    return qValue[name].label;
+  }
 
   return q;
+};
+
+const mangeInternalStateOnChange = (qValue, name, value, setFormikState) => {
+  if (!value && qValue) {
+    delete qValue[name];
+    setFormikState({ qValue });
+  }
+};
+
+const mangeInternalStateOnSelect = (qValue, name, item, setFormikState, autoCleanup) => {
+  if (autoCleanup) {
+    delete qValue[name];
+    setFormikState({ qValue });
+  } else {
+    setFormikState({ qValue: { ...qValue, ...{ [name]: item } } });
+  }
 };
 
 const AutocompleteInput = ({
@@ -29,6 +52,7 @@ const AutocompleteInput = ({
   createLink,
   createLabel,
   inputProps,
+  autoCleanup,
   formCtx: { setFieldValue, setFormikState, qValue }
 }) => (
     <div className="form-group resource-picker">
@@ -63,9 +87,12 @@ const AutocompleteInput = ({
           </div>
         }
         value={getValue(q, qValue, name)}
-        onChange={e => handleSearch(e.target.value)}
+        onChange={e => {
+          handleSearch(e.target.value);
+          mangeInternalStateOnChange(qValue, name, e.target.value, setFormikState);
+        }}
         onSelect={value => handleSelect(value, (item) => {
-          setFormikState({ qValue: { ...qValue, ...{ [name]: item } } });
+          mangeInternalStateOnSelect(qValue, name, item, setFormikState, autoCleanup);
           setFieldValue(name, item.value);
 
           if (typeof onSelect == 'function') {
