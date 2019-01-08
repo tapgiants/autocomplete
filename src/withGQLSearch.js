@@ -17,7 +17,7 @@ const withGQLSearch = (gqlFieldProps) => (BaseComponent) => (contextProps) => {
       variables: { filter: filterInputMapperHandler(q) }
     });
 
-    const dataMapperHandler = dataMapper || ((item) => ({ id: item.id, name: item.name }));
+    const dataMapperHandler = dataMapper || ((item) => ({ value: item.id, label: item.name }));
 
     return data[path].list.map(item => dataMapperHandler(item));
   };

@@ -10,17 +10,17 @@ const menuStyle = {
   maxHeight: '50%', // TODO: don't cheat, let it flow to the bottom
 };
 
-const getValue = (q, { selectedItem }) => {
-  if (selectedItem.name != q) { return q; };
+const getValue = (q, qValue, name) => {
+  if (!q) return '';
+  if (qValue && qValue[name]) return qValue[name].label;
 
-  return selectedItem.name;
+  return q;
 };
 
 const AutocompleteInput = ({
   label,
   name,
   q,
-  selectedItem,
   results,
   handleSelect,
   handleSearch,
@@ -29,7 +29,7 @@ const AutocompleteInput = ({
   createLink,
   createLabel,
   inputProps,
-  formCtx: { setFieldValue, setFormikState, ...props }
+  formCtx: { setFieldValue, setFormikState, qValue }
 }) => (
     <div className="form-group resource-picker">
       {label &&
@@ -41,7 +41,7 @@ const AutocompleteInput = ({
         menuStyle={menuStyle}
         wrapperStyle={{ display: 'block' }}
         renderInput={props => <input type="text" className="form-control search-input" placeholder={placeholder} {...props} />}
-        getItemValue={item => item.name}
+        getItemValue={item => item.label}
         items={results}
         renderMenu={(items, _value, style) => (
           <div>
@@ -57,16 +57,17 @@ const AutocompleteInput = ({
         )}
 
         renderItem={(item, isHighlighted) =>
-          <div key={item.id} className={`autocomplete-result ${isHighlighted ? 'focus' : ''}`}>
-            <div className="autocomplete-primary">{item.name}</div>
+          <div key={item.value} className={`autocomplete-result ${isHighlighted ? 'focus' : ''}`}>
+            <div className="autocomplete-primary">{item.label}</div>
             <div className="autocomplete-secondary">{item.description}</div>
           </div>
         }
-        value={getValue(q, { ...{ selectedItem }, ...props })}
+        value={getValue(q, qValue, name)}
         onChange={e => handleSearch(e.target.value)}
         onSelect={value => handleSelect(value, (item) => {
-          setFormikState({ selectedItem: item });
-          setFieldValue(name, item.id)
+          setFormikState({ qValue: { ...qValue, ...{ [name]: item } } });
+          setFieldValue(name, item.value);
+
           if (typeof onSelect == 'function') {
             onSelect(item);
           }

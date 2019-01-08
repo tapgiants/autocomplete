@@ -10,16 +10,16 @@ export default compose(
   setDisplayName('AutocompleteWithHandlers'),
   defaultProps({
     autoCleanup: false,
-    selectedItem: { id: null, name: '', description: '' }
+    selectedItem: { value: null, label: '', description: '' }
   }),
   withState('selectedItem', 'setSelectedItem', ({ rawValues, name, dataMapper, selectedItem }) => {
-    if (selectedItem.id && selectedItem.name) return selectedItem;
+    if (selectedItem.value && selectedItem.label) return selectedItem;
     if (!rawValues || !rawValues[name]) return selectedItem;
 
     return dataMapper(rawValues[name]);
   }),
   withState('results', 'setResults', []),
-  withState('q', 'setQ', ({ selectedItem }) => selectedItem.name),
+  withState('q', 'setQ', ({ selectedItem }) => selectedItem.label),
   withHandlers({
     handleSearch: ({ setQ, setResults, fetchData }) => (q) => {
       setQ(q, () => {
@@ -29,9 +29,9 @@ export default compose(
         });
       });
     },
-    handleSelect: ({ autoCleanup, results, setQ }) => (name, onSelect) => {
-      const item = results.find(p => p.name === name);
-      const q = autoCleanup ? '' : item.name;
+    handleSelect: ({ autoCleanup, results, setQ }) => (label, onSelect) => {
+      const item = results.find(p => p.label === label);
+      const q = autoCleanup ? '' : item.label;
 
       setQ(q, () => onSelect(item));
     }
